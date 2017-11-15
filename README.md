@@ -1,4 +1,4 @@
 # Jims_Project
 
-This is my community college CS coursework, thanks for looking at it. Share with all your friends 
-Plz Hire me
+I Really Love computers and want to share my work with the world.
+This is my community college CS coursework, thanks for looking at it. Share it with all your friends :)
