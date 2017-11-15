@@ -10,19 +10,17 @@ var fs = require('fs');
   }
 }); */
 
-var i=0;
-
-while (i<300){
-publicClient.getProductTicker(function(err, response, data) {
-	//console.log(err);
-	//console.log(data);
+(function (){
+	var timeout = setInterval(function(){
+		publicClient.getProductTicker(function(err, response, data) {
+		//console.log(err);
+		//console.log(data);
 	
-	console.log(data.price);
-	console.log(data.time);
+		console.log(data.price);
+		console.log(data.time);
 	
-	fs.appendFileSync('data.csv',data.price + ',');
-	fs.appendFileSync('data.csv',data.time + '\n');
-	
-});
-i++;
-}
+		fs.appendFileSync('data.csv',data.price + ',');
+		fs.appendFileSync('data.csv',data.time + '\n');
+		});
+	},10000);
+}) ();
