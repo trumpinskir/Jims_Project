@@ -40,6 +40,8 @@ function getDayNum(dayStr){
 
 }
 
+
+
 var i =0;
 (function (){
 var timeout = setInterval(function(){
@@ -56,18 +58,20 @@ var timeout = setInterval(function(){
 	console.log("Hour: " + hour)
 	var minute = time.match(/:[0-9]*:/).toString().substring(1,3)
 	console.log("Minute: " + minute)
+
+	var fileName = "gdax_" + date_str + ".csv"
 	
 	//#place header for file if first write
 	if(i == 0){
-		fs.appendFileSync('data.csv', 'PRICE,');
-		fs.appendFileSync('data.csv', 'DAY,');
-		fs.appendFileSync('data.csv', 'HOUR,');
-		fs.appendFileSync('data.csv', 'MINUTE\n');
+		fs.appendFileSync(fileName, 'PRICE,');
+		fs.appendFileSync(fileName, 'DAY,');
+		fs.appendFileSync(fileName, 'HOUR,');
+		fs.appendFileSync(fileName, 'MINUTE\n');
 	}
-	fs.appendFileSync('data.csv',data.price + ',');
-	fs.appendFileSync('data.csv',day + ',');
-	fs.appendFileSync('data.csv',hour + ',');
-	fs.appendFileSync('data.csv',minute + '\n');
+	fs.appendFileSync(fileName,data.price + ',');
+	fs.appendFileSync(fileName,day + ',');
+	fs.appendFileSync(fileName,hour + ',');
+	fs.appendFileSync(fileName,minute + '\n');
 	if(i < 360){
 		i++;
 	}
