@@ -6,15 +6,9 @@ http = require('http'),
 url = require('url'),
 XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
 
-var gdaxObData, krakenObData, poloniexObData;
+var gdaxObData, krakenObData, poloniexObData, gdaxTradeHistoryData;
 
-/* publicClient.getProducts((error, response, data) => {
-  if (error) {
-    console.log(error);
-  } else {
-    console.log(data);
-  }
-}); */
+
 function getDayName(dateStr, locale)
 {
     var date = new Date(dateStr);
@@ -45,46 +39,52 @@ function getDayNum(dayStr){
 	}
 }
 
-function ultimateCallback(gdaxResponseHandled, krakenResponseHandled, poloniexResponseHandled, gdaxObData, krakenObData, poloniexObData){
-	if(gdaxResponseHandled && krakenResponseHandled && poloniexResponseHandled){
+function ultimateCallback(gdaxResponseHandled, krakenResponseHandled, poloniexResponseHandled, gdaxTradeHistResponseHandled, gdaxObData, krakenObData, poloniexObData, gdaxTradeHistoryData){
+	if(gdaxResponseHandled && krakenResponseHandled && poloniexResponseHandled && gdaxTradeHistResponseHandled){
 		fs.appendFileSync(fileName, gdaxObData + '?');
 		fs.appendFileSync(fileName, krakenObData + '?');
-		fs.appendFileSync(fileName, poloniexObData + '\n');
+		fs.appendFileSync(fileName, poloniexObData + '?');
+		fs.appendFileSync(fileName, gdaxTradeHistoryData + '\n');
 	}
 }
 
-function handleMisses(gdaxResponseHandled, krakenResponseHandled, poloniexResponseHandled){
-	if(!gdaxResponseHandled || !krakenResponseHandled || !poloniexResponseHandled){
+function handleMisses(gdaxResponseHandled, krakenResponseHandled, poloniexResponseHandled, gdaxTradeHistResponseHandled){
+	if(!gdaxResponseHandled || !krakenResponseHandled || !poloniexResponseHandled || !gdaxTradeHistResponseHandled){
 		fs.appendFileSync(fileName, gdaxObData + '?');
 		fs.appendFileSync(fileName, krakenObData + '?');
-		fs.appendFileSync(fileName, poloniexObData + '\n');
+		fs.appendFileSync(fileName, poloniexObData + '?');
+		fs.appendFileSync(fileName, gdaxTradeHistoryData + '\n');
 	}
 } 
 
 // create new file name
 var date = new Date();
 var fileName = "gdax_" + date.getMonth() + "_" + date.getDate() + "_" + date.getFullYear() + ".csv"
+console.log(fileName)
 // Add headers
 fs.appendFileSync(fileName, 'TIME?');
 fs.appendFileSync(fileName, 'PRICE?');
 fs.appendFileSync(fileName, 'GdaxOb?');
 fs.appendFileSync(fileName, 'KrakenOb?');
-fs.appendFileSync(fileName, 'PoloniexOb\n');
+fs.appendFileSync(fileName, 'PoloniexOb?');
+fs.appendFileSync(fileName, 'GdaxTradeHist\n');
 
 var gdaxResponseHandled,
 	krakenResponseHandled,
-	poloniexResponseHandled;
+	poloniexResponseHandled,
+	gdaxTradeHistResponseHandled;
 
 var i = 0;
 (function (){
 var timeout = setInterval(function(){
 	console.log("\niterated");
 	
-	handleMisses(gdaxResponseHandled,krakenResponseHandled, poloniexResponseHandled);
+	handleMisses(gdaxResponseHandled,krakenResponseHandled, poloniexResponseHandled, gdaxTradeHistResponseHandled);
 	
 	gdaxResponseHandled = false;
 	krakenResponseHandled = false;
 	poloniexResponseHandled = false;
+	gdaxTradeHistResponseHandled = false;
 	
 	
 	
@@ -108,7 +108,7 @@ var timeout = setInterval(function(){
 			gdaxObData = JSON.stringify(data);
 			console.log("GDAX");
 			gdaxResponseHandled = true;
-			ultimateCallback(gdaxResponseHandled, krakenResponseHandled, poloniexResponseHandled, gdaxObData, krakenObData, poloniexObData);
+			ultimateCallback(gdaxResponseHandled, krakenResponseHandled, poloniexResponseHandled, gdaxTradeHistResponseHandled, gdaxObData, krakenObData, poloniexObData, gdaxTradeHistoryData);
 		});	
 		
 		// KRAKEN OB
@@ -122,7 +122,7 @@ var timeout = setInterval(function(){
 				krakenObData = string;
 				krakenResponseHandled = true;
 				console.log("kraken");
-				ultimateCallback(gdaxResponseHandled, krakenResponseHandled, poloniexResponseHandled, gdaxObData, krakenObData, poloniexObData);
+				ultimateCallback(gdaxResponseHandled, krakenResponseHandled, poloniexResponseHandled, gdaxTradeHistResponseHandled, gdaxObData, krakenObData, poloniexObData, gdaxTradeHistoryData);
 			}
 		}	
 		xmlhttp.open("GET","https://api.kraken.com/0/public/Depth?pair=LTCUSD&count=50", true);
@@ -139,11 +139,20 @@ var timeout = setInterval(function(){
 				poloniexObData = string;
 				poloniexResponseHandled = true;
 				console.log("poloniex");
-				ultimateCallback(gdaxResponseHandled, krakenResponseHandled, poloniexResponseHandled, gdaxObData, krakenObData, poloniexObData);
+				ultimateCallback(gdaxResponseHandled, krakenResponseHandled, poloniexResponseHandled, gdaxTradeHistResponseHandled, gdaxObData, krakenObData, poloniexObData, gdaxTradeHistoryData);
 			}
 		}
 		poloxmlhttp.open("GET","https://poloniex.com/public?command=returnOrderBook&currencyPair=USDT_LTC&depth=50", true);
 		poloxmlhttp.send();
+
+		// GDAX Trade History
+		publicClient.getProductTrades(function(err, response, data) {
+			data.exchange="GDAX";
+			gdaxTradeHistoryData = JSON.stringify(data);
+			console.log("GDAX");
+			gdaxTradeHistResponseHandled = true;
+			ultimateCallback(gdaxResponseHandled, krakenResponseHandled, poloniexResponseHandled, gdaxTradeHistResponseHandled, gdaxObData, krakenObData, poloniexObData, gdaxTradeHistoryData);
+		});	
 			
 		
 
