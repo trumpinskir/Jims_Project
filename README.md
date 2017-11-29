@@ -5,3 +5,5 @@ This is my community college CS coursework, thanks for looking at it. Share it w
 
 
 https://imgur.com/a/R3LZR
+
+tasks: https://docs.google.com/spreadsheets/d/1M4otWe9khFJk4DGpGZJzrODp7beGoWf57aVlYX7xtJo/edit?usp=sharing
